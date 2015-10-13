@@ -15,18 +15,18 @@ def main():
 	parser_generate_key.add_argument('--filename', '-n', dest="fname", default="mykey", type=str, help="File name to be saved, w/o extension")
 	parser_generate_key.set_defaults(which='gkey')
 	
-	'''
+	
 	parser_decode = subparsers.add_parser('decode', help='Decode files')
 	parser_decode.add_argument('--file','-f', type=str, help='File location , name , extension')
 	parser_decode.add_argument('--privatekey','-p', type=str, help='Private key location , name , extension')
 	parser_decode.set_defaults(which='decode')
 	
 	parser_encode = subparsers.add_parser('encode', help='b help')
-	parser_encode.add_argument('--file','-f', type=int, help='bar help')
-	parser_encode.add_argument('--file','-f', type=int, help='bar help')
+	parser_encode.add_argument('--file','-f', type=str, help='bar help')
+	parser_encode.add_argument('--publickey','-p', type=str, dest="keyloc", help='Public key location , name , extension')
 	parser_encode.set_defaults(which='encode')
-	'''
 	
+	test = True
 	args = parser.parse_args()
 	
 	if args.which == "gkey":
@@ -52,12 +52,26 @@ def main():
 			except:
 				pass
 			print("Created key files sucessfully")
+			if test:
+				toenc = input().encode('utf-8')		
+				print("\nWill be encrypted : " + toenc.decode('utf-8'))
+				print("After encryption  : " + binascii.hexlify(rsa.encrypt(toenc, pubkey) ).decode('utf-8'))
+				print("After decryption  : " + rsa.decrypt(rsa.encrypt(toenc, pubkey), privkey).decode('utf-8'))
+	elif args.which == "encode":
+		pk = open(args.keyloc, 'rb')
+		privkey = rsa.PrivateKey.load_pkcs1(pk.read(), format='PEM')
+		toenc = input().encode('utf-8')		
+		print("\nWill be encrypted : " + toenc.decode('utf-8'))
+		print("After encryption  : " + binascii.hexlify(rsa.encrypt(toenc, pubkey) ).decode('utf-8'))
+		print("After decryption  : " + rsa.decrypt(rsa.encrypt(toenc, pubkey), privkey).decode('utf-8'))
+	elif args.which == "decode":
+		pk = open(args.keyloc, 'rb')
+		pubkey = rsa.PublicKey.load_pkcs1(pk.read(), format='PEM')
 	
 	
-	toenc = input().encode('utf-8')		
-	print("\nWill be encrypted : " + toenc.decode('utf-8'))
-	print("After encryption  : " + binascii.hexlify(rsa.encrypt(toenc, pubkey) ).decode('utf-8'))
-	print("After decryption  : " + rsa.decrypt(rsa.encrypt(toenc, pubkey), privkey).decode('utf-8'))
+	
+	
+	
 	
 	return 0
 
